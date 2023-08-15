@@ -10,10 +10,23 @@ const register = (req, res, next) => {
         email: req.body.email,
         password: hash,
     });
+    
     return user
     .save()
     .then(
-        (response) => res.status(200).json(response),
+        (response) => {
+            const accessToken = jwt.sign({ email: response.email, userId: response._id.toString() }, "accessSecret", {
+                expiresIn: '2h',
+            })
+            return res.status(200).json({
+            statusCode: 200,
+            message: "User successfully created",
+            user: { 
+                name: response.name,
+                email: response.email
+             },
+            accessToken
+        })},
         (err) => res.status(500).json(err)
     );
 }
