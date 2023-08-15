@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-function isAuthenticated(req, res, next) {
+
+const isAuthenticated = (req, res, next) => {
     try {
         let token = req.get("authorization");
         if (!token) {
@@ -7,10 +8,13 @@ function isAuthenticated(req, res, next) {
         }
         token = token.split(" ")[1];
         const decoded = jwt.verify(token, "accessSecret");
+        console.log(decoded)
         req.email = decoded.email;
+        req.userId = decoded.userId;
         next();
     } catch (error) {
         return res.status(401).json({ success: false, msg: error.message });
     }
 }
-module.exports = { isAuthenticated }
+
+module.exports = isAuthenticated
