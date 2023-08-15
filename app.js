@@ -1,6 +1,7 @@
 const express = require('express')
 const userRoutes = require('./src/routes/userRoutes')
 const blogRoutes = require('./src/routes/blogRoutes')
+const cors = require('cors');
 require("dotenv").config();
 const dbConnection = require('./conn')
 
@@ -19,3 +20,7 @@ app.listen(port, () => {
 
 app.use('/user', userRoutes)
 app.use('/blog', blogRoutes)
+
+app.use(cors({
+  origin: '*'
+}));
