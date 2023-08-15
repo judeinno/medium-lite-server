@@ -31,7 +31,7 @@ const login = (req, res, next) => {
                     const accessToken = jwt.sign({ email: req.body.email, userId  }, "accessSecret", {
                             expiresIn: '2h',
                         })
-                    return res.status(200).json({ accessToken })
+                    return res.status(200).json({ statusCode: 200, accessToken, user: response })
                 } else {
                     return res.status(401).json({ message: "Wrong password" });
                 }
