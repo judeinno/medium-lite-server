@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken")
 const register = (req, res, next) => {
     const hash = bcrypt.hashSync(req.body.password, saltRounds);
     const user = new User({
-        username: req.body.username,
+        name: req.body.name,
         email: req.body.email,
         password: hash,
     });
