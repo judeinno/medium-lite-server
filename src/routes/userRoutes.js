@@ -1,5 +1,6 @@
 const express = require('express');
 const userContoller = require("../controllers/userContoller");
+const isAuthenticated = require("../../src/middleware/isAuthenticated");
 
 const options = {
     "case-sensitive": false,
@@ -10,5 +11,7 @@ const router = express.Router(options)
 router.post("/register", userContoller.register)
 
 router.post("/login", userContoller.login)
+
+router.get("/profile", isAuthenticated, userContoller.getUser)
 
 module.exports = router;

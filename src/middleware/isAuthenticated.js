@@ -8,7 +8,6 @@ const isAuthenticated = (req, res, next) => {
         }
         token = token.split(" ")[1];
         const decoded = jwt.verify(token, "accessSecret");
-        console.log(decoded)
         req.email = decoded.email;
         req.userId = decoded.userId;
         next();

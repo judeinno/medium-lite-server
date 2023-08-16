@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require("jsonwebtoken")
+const { ObjectId } = require('mongodb');
 
 const register = (req, res, next) => {
     const hash = bcrypt.hashSync(req.body.password, saltRounds);
@@ -33,7 +34,6 @@ const register = (req, res, next) => {
 
 const login = (req, res, next) => {
     const password = req.body.password;
-    const user = new User();
     return User
         .findOne({email: req.body.email})
         .then((response) => {
@@ -44,7 +44,11 @@ const login = (req, res, next) => {
                     const accessToken = jwt.sign({ email: req.body.email, userId  }, "accessSecret", {
                             expiresIn: '2h',
                         })
-                    return res.status(200).json({ statusCode: 200, accessToken, user: response })
+                    return res.status(200).json({
+                        statusCode: 200, accessToken, user: {
+                            name: response.name,
+                            email: response.email
+                        } })
                 } else {
                     return res.status(401).json({ message: "Wrong password" });
                 }
@@ -56,5 +60,20 @@ const login = (req, res, next) => {
         ).catch(err => res.status(500).json(err));
 }
 
-module.exports = { register, login };
+const getUser = (req, res, next) => {
+    return User
+        .findOne({ _id: new ObjectId(req.userId) })
+        .then(
+            (response) => res.status(200).json({
+                statusCode: 200, message: 'success', user: {
+                    name: response.name,
+                    email: response.email
+                } }),
+            (err) => res.status(500).json(err)
+        );
+    
+
+}
+
+module.exports = { register, login, getUser };
 
