@@ -78,7 +78,6 @@ const getAll = async (req, res, next) => {
                 }
             }
         ]);
-        console.log(blogs)
         return res.status(200).json({
             statusCode: 200,
             message: 'success',
@@ -90,20 +89,57 @@ const getAll = async (req, res, next) => {
 }
 
 
+const getByID = async (req, res, next) => {
+    try {
+        if (req.params.blogId) {
+            const blog = await Blog.aggregate([
+                { $match: { _id: new mongoose.Types.ObjectId(req.params.blogId) } },
+                {
+                    $addFields: {
+                        authorIdObjectId: { $toObjectId: '$authorId' }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'authorIdObjectId',
+                        foreignField: '_id',
+                        as: 'author'
+                    }
+                },
+                {
+                    $unwind: '$author'
+                },
+                {
+                    $project: {
+                        title: 1,
+                        content: 1,
+                        createdAt: 1,
+                        updatedAt: 1,
+                        'author._id': 1,
+                        'author.name': 1,
+                        'author.email': 1
+                    }
+                }
+            ]);
 
-const getByID = (req, res, next) => {
-    if (req.params.blogId) {
-        return Blog
-            .findOne({ _id: new ObjectId(req.params.blogId) })
-            .then(
-                (response) => res.status(200).json({ statusCode: 200, message: 'success', blogs: response }),
-                (err) => res.status(500).json(err)
-            );
-    } else {
-        return res.status(404).json({ statusCode: 404, message: 'Not found' })
+            if (blog.length === 0) {
+                return res.status(404).json({ statusCode: 404, message: 'Not found' });
+            }
+
+            return res.status(200).json({
+                statusCode: 200,
+                message: 'success',
+                blog: blog[0] // Return the first item from the array
+            });
+        } else {
+            return res.status(404).json({ statusCode: 404, message: 'Not found' });
+        }
+    } catch (error) {
+        return next(error);
     }
-
 }
+
 
 const deleteById = (req, res, next) => {
     if (req.params.blogId) {
@@ -149,6 +185,21 @@ const updateById = (req, res, next) => {
     }
 }
 
+const getMyBlogs = (req, res, next) => {
+    return Blog
+        .find({ authorId: req.userId })
+        .sort({ createdAt: -1 })
+        .then((response) => {
+            if (response.length === 0) {
+                return res.status(200).json({ statusCode: 200, message: 'No Blogs yet, create some' })
+            } else {
+                return res.status(200).json({ statusCode: 200, message: 'success', blogs: response })
+            }
+        })
+        .catch((err) => res.status(500).json(err));
 
-module.exports = { create, getAll, getByID, deleteById, updateById, uploadHandler };
+}
+
+
+module.exports = { create, getAll, getByID, deleteById, updateById, uploadHandler, getMyBlogs };
 

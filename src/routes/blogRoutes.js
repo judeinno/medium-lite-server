@@ -12,6 +12,7 @@ const router = express.Router(options)
 router.post("/create", isAuthenticated, blogContoller.uploadHandler, blogContoller.create)
 router.get("/get", blogContoller.getAll)
 router.get("/get/:blogId", blogContoller.getByID)
+router.get("/my-blogs", isAuthenticated, blogContoller.getMyBlogs)
 router.delete("/delete/:blogId", isAuthenticated, blogContoller.deleteById)
 router.put("/update/:blogId", isAuthenticated, blogContoller.uploadHandler, blogContoller.updateById)
 

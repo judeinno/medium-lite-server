@@ -28,7 +28,11 @@ const register = (req, res, next) => {
              },
             accessToken
         })},
-        (err) => res.status(500).json(err)
+        (err) => {
+            if (err.code === 11000) {
+                return res.status(409).json({ message: "User already exists" });
+            }
+        }
     );
 }
 
