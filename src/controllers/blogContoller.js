@@ -46,6 +46,7 @@ const create = (req, res, next) => {
 const getAll = (req, res, next) => {
     return Blog
         .find()
+        .sort({ createdAt: -1 })
         .then(
             (response) => res.status(200).json({ statusCode: 200, message: 'success', blogs: response}),
             (err) => res.status(500).json(err)

@@ -8,7 +8,7 @@ const blogSchema = new mongoose.Schema({
     authorId: String,
     content: { type: String, required: true },
     isPublished: { type: Boolean, default: false },
-});
+}, { timestamps: true });
 
 const Blog = mongoose.model('Blog', blogSchema);
 
