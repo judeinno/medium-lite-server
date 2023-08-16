@@ -114,6 +114,8 @@ const getByID = async (req, res, next) => {
                     $project: {
                         title: 1,
                         content: 1,
+                        description: 1,
+                        image: 1,
                         createdAt: 1,
                         updatedAt: 1,
                         'author._id': 1,
