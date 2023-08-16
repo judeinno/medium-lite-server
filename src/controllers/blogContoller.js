@@ -1,6 +1,7 @@
 const Blog = require("../models/blogModel");
 const multer = require('multer');
 const helpers = require("../../src/helper");
+const { ObjectId } = require('mongodb');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -52,15 +53,15 @@ const getAll = (req, res, next) => {
 }
 
 const getByID = (req, res, next) => {
-    if (req.params.authorId == req.userId) {
+    if (req.params.blogId) {
         return Blog
-            .find({ authorId: req.userId })
+            .findOne({ _id: new ObjectId(req.params.blogId) })
             .then(
                 (response) => res.status(200).json({ statusCode: 200, message: 'success', blogs: response }),
                 (err) => res.status(500).json(err)
             );
     } else {
-        return res.status(401).json({ statusCode: 401, message: 'Unauthorised' })
+        return res.status(404).json({ statusCode: 404, message: 'Not found' })
      }
     
 }
