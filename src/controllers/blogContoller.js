@@ -222,7 +222,7 @@ const getMyBlogs = async (req, res, next) => {
             }
         ]);
         if (blogs.length === 0) {
-            return res.status(200).json({ statusCode: 200, message: 'No Blogs yet, create some' })
+            return res.status(200).json({ statusCode: 200, message: 'No Blogs yet, create some', blogs: [] })
         } else {
             return res.status(200).json({ statusCode: 200, message: 'success', blogs: blogs })
         }
