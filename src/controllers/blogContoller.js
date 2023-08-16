@@ -187,18 +187,48 @@ const updateById = (req, res, next) => {
     }
 }
 
-const getMyBlogs = (req, res, next) => {
-    return Blog
-        .find({ authorId: req.userId })
-        .sort({ createdAt: -1 })
-        .then((response) => {
-            if (response.length === 0) {
-                return res.status(200).json({ statusCode: 200, message: 'No Blogs yet, create some' })
-            } else {
-                return res.status(200).json({ statusCode: 200, message: 'success', blogs: response })
+const getMyBlogs = async (req, res, next) => {
+    try {
+        const blogs = await Blog.aggregate([
+            { $match: { authorId: req.userId } },
+            { $sort: { createdAt: -1 } },
+            {
+                $addFields: {
+                    authorIdObjectId: { $toObjectId: '$authorId' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'authorIdObjectId',
+                    foreignField: '_id',
+                    as: 'author'
+                }
+            },
+            {
+                $unwind: '$author'
+            },
+            {
+                $project: {
+                    title: 1,
+                    content: 1,
+                    description: 1,
+                    image: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    'author.name': 1,
+                    'author.email': 1
+                }
             }
-        })
-        .catch((err) => res.status(500).json(err));
+        ]);
+        if (blogs.length === 0) {
+            return res.status(200).json({ statusCode: 200, message: 'No Blogs yet, create some' })
+        } else {
+            return res.status(200).json({ statusCode: 200, message: 'success', blogs: blogs })
+        }
+    } catch (error) {
+        return next(error);
+    }
 
 }
 
