@@ -88,7 +88,11 @@ const updateUser = (req, res, next) => {
     return User
         .findOneAndUpdate({ _id: new ObjectId(req.userId) }, user, { new: true })
         .then((response) => {
-            return res.status(200).json({ statusCode: 200, message: 'User successfully updated', blog: response })
+            return res.status(200).json({
+                statusCode: 200, message: 'User successfully updated', user: {
+                    name: response.name,
+                    email: response.email
+                } })
         })
         .catch((err) => res.status(500).json(err));
 }
