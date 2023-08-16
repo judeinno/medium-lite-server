@@ -13,7 +13,7 @@ router.post("/create", isAuthenticated, blogContoller.uploadHandler, blogContoll
 router.get("/get", blogContoller.getAll)
 router.get("/get/:authorId", isAuthenticated, blogContoller.getByID)
 router.delete("/delete/:blogId", isAuthenticated, blogContoller.deleteById)
-router.put("/update/:blogId", isAuthenticated, blogContoller.updateById)
+router.put("/update/:blogId", isAuthenticated, blogContoller.uploadHandler, blogContoller.updateById)
 
 
 module.exports = router;

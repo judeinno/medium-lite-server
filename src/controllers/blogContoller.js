@@ -88,7 +88,7 @@ const updateById = (req, res, next) => {
     const blog = {
         title: req.body.title,
         description: req.body.description,
-        image: req.body.image,
+        image: req.image,
         categories: req.body.categories,
         isPublished: req.body.isPublished,
         authorId
@@ -97,7 +97,6 @@ const updateById = (req, res, next) => {
         return Blog
             .findOneAndUpdate({ _id: req.params.blogId, authorId: req.userId }, blog, { new: true })
             .then((response) => {
-                console.log(response)
                 if (!response) {
                     return res.status(404).json({ statusCode: 404, message: 'Blog not found' })
                 } else {
