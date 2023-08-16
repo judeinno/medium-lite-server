@@ -21,6 +21,7 @@ app.listen(port, () => {
   dbConnection();
 })
 
+app.get('/', (req, res) => res.send('Welcome to Medium Lite Blog API'))
 app.use('/user', userRoutes)
 app.use('/blog', blogRoutes)
 
