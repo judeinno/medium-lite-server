@@ -1,7 +1,9 @@
 const Blog = require("../models/blogModel");
+const User = require("../models/userModel");
 const multer = require('multer');
 const helpers = require("../../src/helper");
 const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -43,15 +45,51 @@ const create = (req, res, next) => {
         );
 }
 
-const getAll = (req, res, next) => {
-    return Blog
-        .find()
-        .sort({ createdAt: -1 })
-        .then(
-            (response) => res.status(200).json({ statusCode: 200, message: 'success', blogs: response}),
-            (err) => res.status(500).json(err)
-        );
+const getAll = async (req, res, next) => {
+    try {
+        const blogs = await Blog.aggregate([
+            { $sort: { createdAt: -1 } },
+            {
+                $addFields: {
+                    authorIdObjectId: { $toObjectId: '$authorId' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'authorIdObjectId',
+                    foreignField: '_id',
+                    as: 'author'
+                }
+            },
+            {
+                $unwind: '$author'
+            },
+            {
+                $project: {
+                    title: 1,
+                    content: 1,
+                    description: 1,
+                    image: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    'author.name': 1,
+                    'author.email': 1
+                }
+            }
+        ]);
+        console.log(blogs)
+        return res.status(200).json({
+            statusCode: 200,
+            message: 'success',
+            blogs: blogs
+        });
+    } catch (error) {
+        return next(error);
+    }
 }
+
+
 
 const getByID = (req, res, next) => {
     if (req.params.blogId) {
@@ -63,22 +101,22 @@ const getByID = (req, res, next) => {
             );
     } else {
         return res.status(404).json({ statusCode: 404, message: 'Not found' })
-     }
-    
+    }
+
 }
 
 const deleteById = (req, res, next) => {
     if (req.params.blogId) {
-            return Blog
-                .findByIdAndDelete({ _id: req.params.blogId, authorId: req.userId })
-                .then((response) => {
-                    if (!response) {
-                        return res.status(404).json({ statusCode: 404, message: 'Blog not found' })
-                    } else {
-                        return res.status(200).json({ statusCode: 200, message: 'Blog deleted successfully', blog: response })
-                    }
-                })
-                .catch((err) => res.status(500).json(err));
+        return Blog
+            .findByIdAndDelete({ _id: req.params.blogId, authorId: req.userId })
+            .then((response) => {
+                if (!response) {
+                    return res.status(404).json({ statusCode: 404, message: 'Blog not found' })
+                } else {
+                    return res.status(200).json({ statusCode: 200, message: 'Blog deleted successfully', blog: response })
+                }
+            })
+            .catch((err) => res.status(500).json(err));
     } else {
         return res.status(404).json({ statusCode: 404, message: 'Blog not found' })
     }
