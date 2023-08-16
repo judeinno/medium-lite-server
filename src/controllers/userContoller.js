@@ -79,5 +79,19 @@ const getUser = (req, res, next) => {
 
 }
 
-module.exports = { register, login, getUser };
+const updateUser = (req, res, next) => {
+    const authorId = req.userId;
+    const user = {
+        name: req.body.name,
+        email: req.body.email
+    };
+    return User
+        .findOneAndUpdate({ _id: new ObjectId(req.userId) }, user, { new: true })
+        .then((response) => {
+            return res.status(200).json({ statusCode: 200, message: 'User successfully updated', blog: response })
+        })
+        .catch((err) => res.status(500).json(err));
+}
+
+module.exports = { register, login, getUser, updateUser };
 

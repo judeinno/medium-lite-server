@@ -15,4 +15,6 @@ router.post("/login", userContoller.login)
 
 router.get("/profile", isAuthenticated, userContoller.getUser)
 
+router.put("/profile", isAuthenticated, userContoller.updateUser)
+
 module.exports = router;
