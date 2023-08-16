@@ -6,6 +6,7 @@ const blogSchema = new mongoose.Schema({
     image: String,
     categories: [String],
     authorId: String,
+    content: { type: String, required: true },
     isPublished: { type: Boolean, default: false },
 });
 

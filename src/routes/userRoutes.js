@@ -2,6 +2,7 @@ const express = require('express');
 const userContoller = require("../controllers/userContoller");
 const isAuthenticated = require("../../src/middleware/isAuthenticated");
 
+
 const options = {
     "case-sensitive": false,
     "strict": false

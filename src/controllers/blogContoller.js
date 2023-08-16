@@ -1,11 +1,34 @@
 const Blog = require("../models/blogModel");
+const multer = require('multer');
+const helpers = require("../../src/helper");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+const myUploadMiddleware = upload.single("image");
+
+const uploadHandler = async (req, res, next) => {
+    try {
+        await helpers.runMiddleware(req, res, myUploadMiddleware);
+        const b64 = Buffer.from(req.file.buffer).toString("base64");
+        let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+        const cldRes = await helpers.handleUpload(dataURI);
+        req.image = cldRes.secure_url;
+        next()
+    } catch (error) {
+        console.log(error);
+        res.send({
+            message: error.message,
+        });
+    }
+};
 
 const create = (req, res, next) => {
     const authorId = req.userId;
     const blog = new Blog({
         title: req.body.title,
         description: req.body.description,
-        image: req.body.image,
+        content: req.body.content,
+        image: req.image,
         categories: req.body.categories,
         isPublished: req.body.isPublished,
         authorId
@@ -88,5 +111,5 @@ const updateById = (req, res, next) => {
 }
 
 
-module.exports = { create, getAll, getByID, deleteById, updateById };
+module.exports = { create, getAll, getByID, deleteById, updateById, uploadHandler };
 

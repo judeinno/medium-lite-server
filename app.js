@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser');
 const userRoutes = require('./src/routes/userRoutes')
 const blogRoutes = require('./src/routes/blogRoutes')
 const cors = require('cors');
@@ -11,6 +12,7 @@ const port = process.env.PORT
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
 app.use(cors({
   origin: '*'
 }));

@@ -8,7 +8,8 @@ const options = {
 }
 const router = express.Router(options)
 
-router.post("/create", isAuthenticated, blogContoller.create)
+
+router.post("/create", isAuthenticated, blogContoller.uploadHandler, blogContoller.create)
 router.get("/get", blogContoller.getAll)
 router.get("/get/:authorId", isAuthenticated, blogContoller.getByID)
 router.delete("/delete/:blogId", isAuthenticated, blogContoller.deleteById)
